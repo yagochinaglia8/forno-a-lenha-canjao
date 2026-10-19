@@ -680,7 +680,7 @@ function show(name){
 const fmtDate = t => new Date(t).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
 
 /* ---------- progresso salvo do jogador (sobrevive a atualizar a página) ---------- */
-const SAVE_KEY = 'canjao_forno_jogador_v5';
+const SAVE_KEY = 'canjao_forno_jogador_v6';
 const freshSave = () => ({ name:'', used:0, best:0, lockedUntil:0, result:null });
 let save = freshSave();
 function loadSave(){
