@@ -654,6 +654,8 @@ const CONFIG = {
   SPEED_UP_PER_HIT: 1.2,   // a cada acerto a barra fica 20% mais rápida
   SPEED_UP_PER_ROUND: 1.04,// e a cada rodada mais 4%
   ZONES: [0.12, 0.11, 0.10, 0.09, 0.08], // tamanho da faixa verde com 0, 1, 2, 3 e 4 acertos (0 a 1)
+  LAST_ROUND_ZONE: 0.14,   // última pizza: faixa verde maior (mais fácil)
+  LAST_ROUND_SLOWER: 1.6,  // última pizza: barra 60% mais lenta que seria
   SPEED_VARIATION: 0.08,   // variação aleatória de velocidade (±8%)
   ZONE_MIN: 0.22,          // a faixa verde nunca começa antes de 22% da barra
   ZONE_MAX: 0.96,          // e nunca termina depois de 96%
@@ -1075,8 +1077,10 @@ function pickZone(size){
 }
 
 function nextRound(){
-  const size = CONFIG.ZONES[Math.min(hits, CONFIG.ZONES.length - 1)];
+  const lastRound = hits === CONFIG.HITS_TO_WIN - 1;
+  const size = lastRound ? CONFIG.LAST_ROUND_ZONE : CONFIG.ZONES[Math.min(hits, CONFIG.ZONES.length - 1)];
   dur = CONFIG.BASE_DUR / speedMult() * (1 + (Math.random()*2 - 1) * CONFIG.SPEED_VARIATION);
+  if (lastRound) dur *= CONFIG.LAST_ROUND_SLOWER;
   zs = pickZone(size);
   ze = zs + size;
   zoneEl.style.left = (zs*100) + '%';
@@ -1086,7 +1090,8 @@ function nextRound(){
   state = 'waiting';
   pullBtn.disabled = true;
   pizzaWrap.classList.add('away');
-  if (lastHit) { showToast('Mais rápido! ⚡', 'bad', 1000); sfx.faster(); }
+  if (lastRound) { showToast('Última pizza! 🍕', 'good', 1100); sfx.faster(); }
+  else if (lastHit) { showToast('Mais rápido! ⚡', 'bad', 1000); sfx.faster(); }
   else showToast(`Rodada ${round+1}`);
   setTimeout(() => pizzaWrap.classList.remove('away'), 250);
   setTimeout(() => {
