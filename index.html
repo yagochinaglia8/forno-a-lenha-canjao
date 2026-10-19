@@ -238,7 +238,7 @@
 
   /* avisos */
   .once-alert{display:flex;gap:10px;align-items:center;text-align:left;margin:4px 0 14px;padding:12px 14px;border-radius:14px;background:#fff1f1;border:2px solid var(--red);font-size:14px;line-height:1.4}
-  .once-alert span:first-child{font-size:22px;line-height:1}
+  .once-alert > span:first-child{font-size:22px;line-height:1}
   .once-alert b{color:var(--red-d)}
   .go-queue{display:flex;gap:10px;align-items:center;text-align:left;margin:0 0 14px;padding:14px;border-radius:14px;background:var(--green-d);color:#fff;font-size:15px;line-height:1.4;box-shadow:0 6px 14px rgba(11,107,54,.35)}
   .go-queue span:first-child{font-size:28px;line-height:1}
@@ -540,16 +540,16 @@
       <input class="name-input" id="nameInput" type="text" maxlength="24" placeholder="Digite seu nome" autocomplete="off" autocapitalize="words" enterkeyhint="go" spellcheck="false" aria-label="Seu nome">
     </div>
     <button class="btn green" id="nameBtn" type="button" disabled>Continuar 🍕</button>
-    <p class="once-chip">⭐ Você tem <b id="nameAttempts">uma única chance</b> de jogar</p>
+    <p class="once-chip">⭐ Você tem <b id="nameAttempts">2 tentativas</b> para ganhar</p>
   </div>
 </section>
 
 <!-- 2. TUTORIAL -->
 <section class="overlay" id="scrTutorial" hidden>
   <div class="card">
-    <span class="attempt-tag" id="tutAttempt">Chance única</span>
+    <span class="attempt-tag" id="tutAttempt">Tentativa 1 de 2</span>
     <h2 id="tutHello">Bora, pizzaiolo!</h2>
-    <div class="once-alert"><span>⚠️</span><span>Atenção: <b>cada pessoa tem somente UMA chance de jogar.</b> Capriche!</span></div>
+    <div class="once-alert"><span>⚠️</span><span>Atenção: <b>cada pessoa tem somente <span id="alertAttempts">2 tentativas</span>.</b> Capriche!</span></div>
     <div class="demo" aria-hidden="true">
       <div class="track"><div class="cover"></div></div>
       <div class="zone"></div>
@@ -561,7 +561,7 @@
       <li><span>A pizza entra no forno e a <b>barra de cozimento</b> começa a encher.</span></li>
       <li><span>Toque em <b>TIRAR A PIZZA</b> quando a agulha estiver <b>dentro da faixa verde</b>.</span></li>
       <li><span>A cada pizza no ponto, a barra fica <b>mais rápida ⚡</b> e a faixa verde fica <b>menor</b> e <b>muda de lugar</b>.</span></li>
-      <li><span>Tire <b id="tutHits">5 pizzas seguidas no ponto</b> e ganhe uma chance de girar a roleta! Errou uma pizza (crua ou queimada), o jogo acaba, e você tem <b id="tutLives">uma única chance</b>.</span></li>
+      <li><span>Tire <b id="tutHits">5 pizzas seguidas no ponto</b> e ganhe uma chance de girar a roleta! Errou uma pizza (crua ou queimada), a tentativa acaba. Você tem <b id="tutLives">2 tentativas</b>.</span></li>
     </ol>
     <button class="btn green" id="playBtn">Entendi, vamos jogar!</button>
   </div>
@@ -584,7 +584,7 @@
     <div class="big-emoji secret-tap">🍕</div>
     <h2>Não foi dessa vez…</h2>
     <p id="overText"></p>
-    <div class="lockbox">Cada pessoa tem <b>uma única chance</b> de jogar. Obrigado por participar! 🧡</div>
+    <div class="lockbox">Suas tentativas acabaram. Obrigado por participar! 🧡</div>
     <p class="small">Mas agora você já sabe: o Canjão também é pizza napolitana de forno a lenha. Vem provar!</p>
     <button class="btn green" id="shareBtn1">📤 Compartilhar</button>
   </div>
@@ -646,9 +646,9 @@
    CONFIGURAÇÕES — ajuste aqui
    ============================================================ */
 const CONFIG = {
-  ATTEMPTS: 1,             // chance única por pessoa (por aparelho)
-  LOCK_HOURS: 720,         // bloqueio depois de jogar (30 dias). Para liberar o aparelho para outra pessoa, use o painel secreto
-  LIVES: 1,                // 1 erro (pizza crua ou queimada) encerra o jogo
+  ATTEMPTS: 2,             // tentativas por pessoa (por aparelho)
+  LOCK_HOURS: 720,         // bloqueio depois de ganhar ou gastar as tentativas (30 dias). Para liberar o aparelho para outra pessoa, use o painel secreto
+  LIVES: 1,                // 1 erro (pizza crua ou queimada) encerra a tentativa
   HITS_TO_WIN: 5,          // pizzas seguidas no ponto para ganhar
   BASE_DUR: 2.4,           // segundos para a barra encher na 1ª pizza
   SPEED_UP_PER_HIT: 1.2,   // a cada acerto a barra fica 20% mais rápida
@@ -673,7 +673,7 @@ function show(name){
 const fmtDate = t => new Date(t).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
 
 /* ---------- progresso salvo do jogador (sobrevive a atualizar a página) ---------- */
-const SAVE_KEY = 'canjao_forno_jogador_v4';
+const SAVE_KEY = 'canjao_forno_jogador_v5';
 const freshSave = () => ({ name:'', used:0, best:0, lockedUntil:0, result:null });
 let save = freshSave();
 function loadSave(){
@@ -721,6 +721,7 @@ function goTutorial(){
 const attemptsLabel = CONFIG.ATTEMPTS === 1 ? 'uma única chance' : `${CONFIG.ATTEMPTS} tentativas`;
 $('#nameAttempts').textContent = attemptsLabel;
 $('#tutLives').textContent = attemptsLabel;
+$('#alertAttempts').textContent = CONFIG.ATTEMPTS === 1 ? 'UMA chance de jogar' : attemptsLabel;
 $('#tutHits').textContent = `${CONFIG.HITS_TO_WIN} pizzas seguidas no ponto`;
 
 /* ---------- telas finais ---------- */
