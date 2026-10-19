@@ -243,6 +243,8 @@
   .go-queue{display:flex;gap:10px;align-items:center;text-align:left;margin:0 0 14px;padding:14px;border-radius:14px;background:var(--green-d);color:#fff;font-size:15px;line-height:1.4;box-shadow:0 6px 14px rgba(11,107,54,.35)}
   .go-queue span:first-child{font-size:28px;line-height:1}
   .card .fine-print{margin:6px 0 0;font-size:10.5px;opacity:.6}
+  .timer-box .timer{display:inline-block;min-width:3.2em;font-variant-numeric:tabular-nums;color:var(--red-d);font-size:17px}
+  #scrWin .timer-box{margin:0 0 10px}
 
   /* tutorial */
   .demo{position:relative;height:24px;margin:30px 8px 30px}
@@ -584,9 +586,10 @@
     <div class="big-emoji secret-tap">🍕</div>
     <h2>Não foi dessa vez…</h2>
     <p id="overText"></p>
-    <div class="lockbox">Suas tentativas acabaram. Obrigado por participar! 🧡</div>
+    <div class="lockbox timer-box" id="overLock">⏳ Você poderá jogar de novo em <b class="timer" id="overCountdown">5:00</b></div>
+    <button class="btn" id="againBtn1" hidden>Jogar de novo 🍕</button>
     <p class="small">Mas agora você já sabe: o Canjão também é pizza napolitana de forno a lenha. Vem provar!</p>
-    <button class="btn green" id="shareBtn1">📤 Compartilhar</button>
+    <button class="btn green" id="shareBtn1" style="margin-top:10px">📤 Compartilhar</button>
   </div>
 </section>
 
@@ -604,6 +607,8 @@
     </div>
     <div class="go-queue"><span>🎡</span><span><b>Dirija-se até a fila</b> para descobrir qual prêmio te espera na roleta!</span></div>
     <div class="notice"><span>📸</span><span><b>Tire um print desta tela agora</b> e guarde na sua galeria. Você vai precisar mostrar o print para a equipe na hora de girar a roleta.</span></div>
+    <div class="lockbox timer-box" id="winLock">⏳ Nova partida liberada em <b class="timer" id="winCountdown">5:00</b></div>
+    <button class="btn" id="againBtn2" hidden style="margin-bottom:10px">Jogar de novo 🍕</button>
     <button class="btn green" id="shareBtn2">📤 Compartilhar</button>
     <p class="small" style="margin:12px 0 0">Seu resultado fica salvo neste aparelho.</p>
     <p class="fine-print">*Somente um prêmio por pessoa.</p>
@@ -647,7 +652,7 @@
    ============================================================ */
 const CONFIG = {
   ATTEMPTS: 2,             // tentativas por pessoa (por aparelho)
-  LOCK_HOURS: 720,         // bloqueio depois de ganhar ou gastar as tentativas (30 dias). Para liberar o aparelho para outra pessoa, use o painel secreto
+  LOCK_MINUTES: 5,         // depois de ganhar ou gastar as tentativas, a pessoa espera este tempo para jogar de novo
   LIVES: 1,                // 1 erro (pizza crua ou queimada) encerra a tentativa
   HITS_TO_WIN: 5,          // pizzas seguidas no ponto para ganhar
   BASE_DUR: 2.8,           // segundos para a barra encher na 1ª pizza
@@ -680,19 +685,20 @@ const freshSave = () => ({ name:'', used:0, best:0, lockedUntil:0, result:null }
 let save = freshSave();
 function loadSave(){
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) save = Object.assign(freshSave(), s); } catch(e){}
-  if (save.lockedUntil && Date.now() >= save.lockedUntil) { save = freshSave(); persist(); }
+  if (save.lockedUntil && Date.now() >= save.lockedUntil) { const n = save.name; save = freshSave(); save.name = n; persist(); }
 }
 function persist(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e){} }
 function lock(result){
   save.result = result;
-  save.lockedUntil = Date.now() + CONFIG.LOCK_HOURS * 3600e3;
+  save.lockedUntil = Date.now() + CONFIG.LOCK_MINUTES * 60e3;
   persist();
 }
 function fmtLeft(ms){
   ms = Math.max(0, ms);
   let h = Math.floor(ms / 3600e3), m = Math.ceil((ms % 3600e3) / 60e3);
   if (m === 60) { h++; m = 0; }
-  return h ? `${h}h ${String(m).padStart(2,'0')}min` : `${m} min`;
+  if (!h) { const s = Math.ceil(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2,'0')}`; }
+  return `${h}h ${String(m).padStart(2,'0')}min`;
 }
 
 /* ---------- jogador ---------- */
@@ -732,6 +738,7 @@ function showWin(){
   $('#winTitle').textContent = `Parabéns, ${firstName()}!`;
   $('#winCode').textContent = r.code;
   $('#winTime').textContent = fmtDate(r.time);
+  updateCountdown();
   show('win'); prepareShare();
 }
 function showOver(){
@@ -744,10 +751,21 @@ function showOver(){
 function updateCountdown(){
   if (!save.lockedUntil) return;
   const left = save.lockedUntil - Date.now();
-  if (left <= 0) { boot(); return; }
-  const el = $('#overCountdown'); if (el) el.textContent = fmtLeft(left);
+  const done = left <= 0;
+  ['#overLock','#winLock'].forEach(s => $(s).hidden = done);
+  ['#againBtn1','#againBtn2'].forEach(s => $(s).hidden = !done);
+  if (!done) { const t = fmtLeft(left); $('#overCountdown').textContent = t; $('#winCountdown').textContent = t; }
 }
-setInterval(updateCountdown, 15000);
+setInterval(updateCountdown, 1000);
+function playAgain(){
+  const n = save.name;
+  save = freshSave(); save.name = n; persist();
+  lives = CONFIG.LIVES; hits = 0; round = 0; renderHud();
+  setPlayer(save.name);
+  goTutorial();
+}
+$('#againBtn1').onclick = playAgain;
+$('#againBtn2').onclick = playAgain;
 
 /* ---------- registro do pré-teste ---------- */
 const LOG_KEY = 'canjao_forno_log_v2';
