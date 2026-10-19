@@ -216,7 +216,33 @@
     padding:14px 12px;border-radius:14px;border:3px solid #e6d5b8;background:#fff;outline:none;margin:0 0 14px;
     user-select:text;-webkit-user-select:text;
   }
-  .name-input:focus{border-color:var(--green)}
+  .name-input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(0,146,70,.15)}
+
+  /* tela de nome */
+  .name-card{padding-top:22px}
+  .thanks{
+    position:relative;margin:4px 0 18px;padding:16px 14px 14px;border-radius:16px;color:#fff;
+    background:linear-gradient(160deg,#e03b47 0%,var(--red-d) 100%);
+    box-shadow:0 8px 18px rgba(158,29,39,.35), inset 0 2px 0 rgba(255,255,255,.18);
+  }
+  .thanks::after{content:"";position:absolute;left:50%;bottom:-9px;width:18px;height:18px;transform:translateX(-50%) rotate(45deg);background:var(--red-d);border-radius:3px}
+  .thanks-emoji{font-size:30px;line-height:1;margin-bottom:6px}
+  .card .thanks-title{font-weight:800;font-size:17px;line-height:1.3;margin:0 0 4px}
+  .card .thanks-sub{font-size:13px;line-height:1.4;margin:0 0 10px;opacity:.92}
+  .card .thanks-sign{display:inline-block;margin:0;font-size:13px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 14px}
+  .card .name-lead{font-size:15px;margin:0 0 14px}
+  .name-field{position:relative;margin:0 0 14px}
+  .name-field .name-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:22px;pointer-events:none}
+  .name-field .name-input{margin:0;padding-left:48px;padding-right:48px}
+  .card .once-chip{display:inline-block;margin:14px 0 0;font-size:13px;background:#fff7d6;border:2px solid var(--gold);border-radius:999px;padding:6px 14px}
+
+  /* avisos */
+  .once-alert{display:flex;gap:10px;align-items:center;text-align:left;margin:4px 0 14px;padding:12px 14px;border-radius:14px;background:#fff1f1;border:2px solid var(--red);font-size:14px;line-height:1.4}
+  .once-alert span:first-child{font-size:22px;line-height:1}
+  .once-alert b{color:var(--red-d)}
+  .go-queue{display:flex;gap:10px;align-items:center;text-align:left;margin:0 0 14px;padding:14px;border-radius:14px;background:var(--green-d);color:#fff;font-size:15px;line-height:1.4;box-shadow:0 6px 14px rgba(11,107,54,.35)}
+  .go-queue span:first-child{font-size:28px;line-height:1}
+  .card .fine-print{margin:6px 0 0;font-size:10.5px;opacity:.6}
 
   /* tutorial */
   .demo{position:relative;height:24px;margin:30px 8px 30px}
@@ -287,7 +313,7 @@
 
     <div class="hud">
       <div class="pill player" id="hudName">👤 —</div>
-      <div class="pill" id="hudHits">🍕 0/3</div>
+      <div class="pill" id="hudHits">🍕 0/5</div>
       <div class="pill speed" id="hudSpeed">⚡ 1,0x</div>
     </div>
 
@@ -499,23 +525,31 @@
 
 <!-- 1. NOME -->
 <section class="overlay" id="scrName" hidden>
-  <div class="card">
+  <div class="card name-card">
+    <div class="thanks">
+      <div class="thanks-emoji">🧡</div>
+      <p class="thanks-title">Obrigado por responder o formulário!</p>
+      <p class="thanks-sub">Sua opinião faz toda a diferença no nosso trabalho.</p>
+      <p class="thanks-sign">A <b>Agência WolfPack</b> agradece 🐺</p>
+    </div>
     <p class="kicker secret-tap" id="secret">O Canjão que você não conhecia</p>
     <h2>Forno a Lenha</h2>
-    <p>Antes de começar, como você se chama?</p>
-    <div>
-      <input class="name-input" id="nameInput" type="text" maxlength="24" placeholder="Digite seu nome" autocomplete="off" autocapitalize="words" enterkeyhint="go" spellcheck="false">
-      <button class="btn green" id="nameBtn" type="button" disabled>Continuar</button>
+    <p class="name-lead">Agora é sua vez de virar pizzaiolo.<br>Como você se chama?</p>
+    <div class="name-field">
+      <span class="name-icon" aria-hidden="true">👨‍🍳</span>
+      <input class="name-input" id="nameInput" type="text" maxlength="24" placeholder="Digite seu nome" autocomplete="off" autocapitalize="words" enterkeyhint="go" spellcheck="false" aria-label="Seu nome">
     </div>
-    <p class="small" style="margin:14px 0 0">Você tem <b id="nameAttempts">2 tentativas</b> para ganhar.</p>
+    <button class="btn green" id="nameBtn" type="button" disabled>Continuar 🍕</button>
+    <p class="once-chip">⭐ Você tem <b id="nameAttempts">uma única chance</b> de jogar</p>
   </div>
 </section>
 
 <!-- 2. TUTORIAL -->
 <section class="overlay" id="scrTutorial" hidden>
   <div class="card">
-    <span class="attempt-tag" id="tutAttempt">Tentativa 1 de 2</span>
+    <span class="attempt-tag" id="tutAttempt">Chance única</span>
     <h2 id="tutHello">Bora, pizzaiolo!</h2>
+    <div class="once-alert"><span>⚠️</span><span>Atenção: <b>cada pessoa tem somente UMA chance de jogar.</b> Capriche!</span></div>
     <div class="demo" aria-hidden="true">
       <div class="track"><div class="cover"></div></div>
       <div class="zone"></div>
@@ -527,7 +561,7 @@
       <li><span>A pizza entra no forno e a <b>barra de cozimento</b> começa a encher.</span></li>
       <li><span>Toque em <b>TIRAR A PIZZA</b> quando a agulha estiver <b>dentro da faixa verde</b>.</span></li>
       <li><span>A cada pizza no ponto, a barra fica <b>mais rápida ⚡</b> e a faixa verde fica <b>menor</b> e <b>muda de lugar</b>.</span></li>
-      <li><span>Errou uma pizza (crua ou queimada), a tentativa acaba. Você tem <b id="tutLives">2 tentativas</b>. Tire <b id="tutHits">3 pizzas seguidas no ponto</b> e ganhe uma chance de girar a roleta!</span></li>
+      <li><span>Tire <b id="tutHits">5 pizzas seguidas no ponto</b> e ganhe uma chance de girar a roleta! Errou uma pizza (crua ou queimada), o jogo acaba, e você tem <b id="tutLives">uma única chance</b>.</span></li>
     </ol>
     <button class="btn green" id="playBtn">Entendi, vamos jogar!</button>
   </div>
@@ -550,7 +584,7 @@
     <div class="big-emoji secret-tap">🍕</div>
     <h2>Não foi dessa vez…</h2>
     <p id="overText"></p>
-    <div class="lockbox">⏳ Você poderá jogar de novo em <b id="overCountdown">3h 00min</b></div>
+    <div class="lockbox">Cada pessoa tem <b>uma única chance</b> de jogar. Obrigado por participar! 🧡</div>
     <p class="small">Mas agora você já sabe: o Canjão também é pizza napolitana de forno a lenha. Vem provar!</p>
     <button class="btn green" id="shareBtn1">📤 Compartilhar</button>
   </div>
@@ -568,9 +602,11 @@
       <div class="code" id="winCode">CJ-00000</div>
       <div><span class="t-time" id="winTime"></span></div>
     </div>
+    <div class="go-queue"><span>🎡</span><span><b>Dirija-se até a fila</b> para descobrir qual prêmio te espera na roleta!</span></div>
     <div class="notice"><span>📸</span><span><b>Tire um print desta tela agora</b> e guarde na sua galeria. Você vai precisar mostrar o print para a equipe na hora de girar a roleta.</span></div>
     <button class="btn green" id="shareBtn2">📤 Compartilhar</button>
     <p class="small" style="margin:12px 0 0">Seu resultado fica salvo neste aparelho.</p>
+    <p class="fine-print">*Somente um prêmio por pessoa.</p>
   </div>
 </section>
 
@@ -610,14 +646,14 @@
    CONFIGURAÇÕES — ajuste aqui
    ============================================================ */
 const CONFIG = {
-  ATTEMPTS: 2,             // tentativas por pessoa (por aparelho)
-  LOCK_HOURS: 3,           // horas de bloqueio depois de ganhar ou gastar as tentativas
-  LIVES: 1,                // 1 erro (pizza crua ou queimada) encerra a tentativa
-  HITS_TO_WIN: 3,          // pizzas no ponto para ganhar
+  ATTEMPTS: 1,             // chance única por pessoa (por aparelho)
+  LOCK_HOURS: 720,         // bloqueio depois de jogar (30 dias). Para liberar o aparelho para outra pessoa, use o painel secreto
+  LIVES: 1,                // 1 erro (pizza crua ou queimada) encerra o jogo
+  HITS_TO_WIN: 5,          // pizzas seguidas no ponto para ganhar
   BASE_DUR: 2.4,           // segundos para a barra encher na 1ª pizza
-  SPEED_UP_PER_HIT: 1.3,   // a cada acerto a barra fica 30% mais rápida
-  SPEED_UP_PER_ROUND: 1.04,// e a cada rodada (mesmo errando) mais 4%
-  ZONES: [0.12, 0.10, 0.08], // tamanho da faixa verde com 0, 1 e 2 acertos (0 a 1)
+  SPEED_UP_PER_HIT: 1.2,   // a cada acerto a barra fica 20% mais rápida
+  SPEED_UP_PER_ROUND: 1.04,// e a cada rodada mais 4%
+  ZONES: [0.12, 0.11, 0.10, 0.09, 0.08], // tamanho da faixa verde com 0, 1, 2, 3 e 4 acertos (0 a 1)
   SPEED_VARIATION: 0.08,   // variação aleatória de velocidade (±8%)
   ZONE_MIN: 0.22,          // a faixa verde nunca começa antes de 22% da barra
   ZONE_MAX: 0.96,          // e nunca termina depois de 96%
@@ -637,7 +673,7 @@ function show(name){
 const fmtDate = t => new Date(t).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
 
 /* ---------- progresso salvo do jogador (sobrevive a atualizar a página) ---------- */
-const SAVE_KEY = 'canjao_forno_jogador_v3';
+const SAVE_KEY = 'canjao_forno_jogador_v4';
 const freshSave = () => ({ name:'', used:0, best:0, lockedUntil:0, result:null });
 let save = freshSave();
 function loadSave(){
@@ -664,7 +700,7 @@ const fmtName = s => s.trim().replace(/\s+/g,' ').split(' ').map(w => w.charAt(0
 const firstName = () => (playerName || 'Jogador').split(' ')[0];
 function setPlayer(name){
   playerName = name;
-  $('#hudName').textContent = `👤 ${firstName()} · ${Math.max(1, save.used)}/${CONFIG.ATTEMPTS}`;
+  $('#hudName').textContent = CONFIG.ATTEMPTS === 1 ? `👤 ${firstName()}` : `👤 ${firstName()} · ${Math.max(1, save.used)}/${CONFIG.ATTEMPTS}`;
 }
 nameInput.addEventListener('input', () => { nameBtn.disabled = nameInput.value.trim().length < 2; });
 function submitName(){
@@ -678,12 +714,13 @@ nameBtn.addEventListener('click', submitName);
 nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitName(); } });
 
 function goTutorial(){
-  $('#tutAttempt').textContent = `Tentativa ${save.used + 1} de ${CONFIG.ATTEMPTS}`;
+  $('#tutAttempt').textContent = CONFIG.ATTEMPTS === 1 ? 'Chance única' : `Tentativa ${save.used + 1} de ${CONFIG.ATTEMPTS}`;
   $('#tutHello').textContent = `Bora, ${firstName()}!`;
   show('tutorial');
 }
-$('#nameAttempts').textContent = `${CONFIG.ATTEMPTS} tentativas`;
-$('#tutLives').textContent = `${CONFIG.ATTEMPTS} tentativas`;
+const attemptsLabel = CONFIG.ATTEMPTS === 1 ? 'uma única chance' : `${CONFIG.ATTEMPTS} tentativas`;
+$('#nameAttempts').textContent = attemptsLabel;
+$('#tutLives').textContent = attemptsLabel;
 $('#tutHits').textContent = `${CONFIG.HITS_TO_WIN} pizzas seguidas no ponto`;
 
 /* ---------- telas finais ---------- */
@@ -695,7 +732,9 @@ function showWin(){
   show('win'); prepareShare();
 }
 function showOver(){
-  $('#overText').textContent = `Suas ${CONFIG.ATTEMPTS} tentativas acabaram, ${firstName()}. Seu melhor resultado foi ${save.best} de ${CONFIG.HITS_TO_WIN} pizzas no ponto.`;
+  $('#overText').textContent = CONFIG.ATTEMPTS === 1
+    ? `Poxa, ${firstName()}! Você tirou ${save.best} de ${CONFIG.HITS_TO_WIN} pizzas no ponto. O forno a lenha não perdoa!`
+    : `Suas ${CONFIG.ATTEMPTS} tentativas acabaram, ${firstName()}. Seu melhor resultado foi ${save.best} de ${CONFIG.HITS_TO_WIN} pizzas no ponto.`;
   updateCountdown();
   show('over'); prepareShare();
 }
@@ -703,7 +742,7 @@ function updateCountdown(){
   if (!save.lockedUntil) return;
   const left = save.lockedUntil - Date.now();
   if (left <= 0) { boot(); return; }
-  $('#overCountdown').textContent = fmtLeft(left);
+  const el = $('#overCountdown'); if (el) el.textContent = fmtLeft(left);
 }
 setInterval(updateCountdown, 15000);
 
